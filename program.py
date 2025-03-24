@@ -1,7 +1,7 @@
 import dpkt, sys, socket
 
 file_path = input("Please enter a valid PCAP file name or path: ")
-
+file_path = "assignment2.pcap"
 # Ensure file is of right extension
 while not file_path.endswith(".pcap") and not file_path.endswith(".pcap/"):
 	file_path = input("Invalid file type. Please enter a valid PCAP file name or path: ")
@@ -158,7 +158,7 @@ for timestamp, data in pcap:
 		if flow_identifier not in tcp_flows:
 			continue
 		
-		
+		flow = tcp_flows[flow_identifier]
 		# Check if sender already sent a FIN packet and ACK was sent separately
 		if tcp_flows[flow_identifier]["flow_fin"] and tcp.flags & dpkt.tcp.TH_ACK and socket.inet_ntoa(ip.src) == flow_identifier[0]:	
 			parse_flow_segment(flow_identifier, timestamp)
@@ -197,8 +197,14 @@ for timestamp, data in pcap:
 # Index flows
 flow_count = 1
 print(f"Total Flows: {num_flows}\n")
-for flow in inactive_flows:
-	print(f"TCP FLOW {flow_count}\nSource Port: {flow[0][1]}\nSource IP: {flow[0][0]}\nDestination Port: {flow[0][3]}\nDestination IP: {flow[0][2]}\n\nTransaction 1\nSequence Number: {flow[1]["seq1"]}\nAcknowledgment Number: {flow[1]["ack1"]}\nWindow Size: {flow[1]["win1"]}\n\nTransaction 2\nSequence Number: {flow[1]["seq2"]}\nAcknowledgment Number: {flow[1]["ack2"]}\nWindow Size: {flow[1]["win2"]}\nThroughput: {flow[1]["data_sent"]/(flow[1]["end_time"]-flow[1]["start_time"])}\n")
+for flow, info in inactive_flows:
+	print(f"TCP FLOW {flow_count}")
+	print(f"Source Port: {flow[1]}\nSource IP: {flow[0]}\nDestination Port: {flow[3]}\nDestination IP: {flow[2]}\n")
+	if(info["seq1"] > -1):
+		print(f"Transaction 1\nSequence Number: {info["seq1"]}\nAcknowledgment Number: {info["ack1"]}\nWindow Size: {info["win1"]}\n")
+	if(info["seq2"] > -1):
+		print(f"Transaction 2\nSequence Number: {info["seq2"]}\nAcknowledgment Number: {info["ack2"]}\nWindow Size: {info["win2"]}\n")
+	print(f"Throughput: {info["data_sent"]/(info["end_time"]-info["start_time"])}\n")
 	print("--------------------------------------\n")
 	flow_count += 1
 		
