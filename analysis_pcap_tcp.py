@@ -1,7 +1,7 @@
 import dpkt, sys, socket
 
 file_path = input("Please enter a valid PCAP file name or path: ")
-file_path = "assignment2.pcap"
+
 # Ensure file is of right extension
 while not file_path.endswith(".pcap") and not file_path.endswith(".pcap/"):
 	file_path = input("Invalid file type. Please enter a valid PCAP file name or path: ")
